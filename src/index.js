@@ -80,24 +80,26 @@ app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
   const { user } = request;
   const { id } = request.params;
 
-  const userIndex = users.indexOf(user);
-  const todoIndex = users[user].todos.findIndex(todo => todo.id === id);
+  const todo = user.todos.find(todo => todo.id === id);
 
-  if (todoIndex < 0) {
+  todo.done = true;
+
+  if (!todo) {
     return response.status(404).json({ error: "Todo not found!" });
   }
 
-  users[userIndex].todos[todoIndex].done = true;
+  return response.status(200).json(todo);
 });
 
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
   const { user } = request;
   const { id } = request.params;
 
-  const userIndex = users.indexOf(user);
-  const todoIndex = users[user].todos.findIndex(todo => todo.id === id);
+  const todo = user.todos.find(todo => todo.id === id);
 
-  users[userIndex].todos.splice(todoIndex, 1);
+  if (!todo) {
+    return response.status(404).json({ error: "Todo not found!" });
+  }
 
   return response.status(204);
 });
