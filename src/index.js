@@ -43,18 +43,19 @@ app.post('/users', (request, response) => {
 app.get('/todos', checksExistsUserAccount, (request, response) => {
   const { user } = request;
 
-  return user.todos;
+  return response.status(200).json(user.todos);
 });
 
 app.post('/todos', checksExistsUserAccount, (request, response) => {
   const { user } = request;
   const { title, deadline } = request.body;
 
+  const userIndex = users.indexOf(user);
   const todo = { id: uuidv4(), title, done: false, deadline: new Date(deadline), created_at: new Date() };
 
-  users[user].todos.push(todo);
+  users[userIndex].todos.push(todo);
 
-  return response.status(200).json(todo);
+  return response.status(201).json(todo);
 });
 
 app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
@@ -62,38 +63,41 @@ app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
   const { id } = request.params;
   const { title, deadline } = request.body;
 
-  const todoIndex = users[user].todos.findIndex(todo => todo.id === id);
+  const userIndex = users.indexOf(user);
+  const todoIndex = users[userIndex].todos.findIndex(todo => todo.id === id);
 
   if (todoIndex < 0) {
     return response.status(404).json({ error: "Todo not found!" });
   }
 
-  users[user].todos[todoIndex].title = title;
-  users[user].todos[todoIndex].deadline = deadline;
+  users[userIndex].todos[todoIndex].title = title;
+  users[userIndex].todos[todoIndex].deadline = deadline;
   
-  return reponse.status(200).json(users[user].todos[todoIndex]);
+  return response.status(200).json(users[userIndex].todos[todoIndex]);
 });
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
   const { user } = request;
   const { id } = request.params;
 
+  const userIndex = users.indexOf(user);
   const todoIndex = users[user].todos.findIndex(todo => todo.id === id);
 
   if (todoIndex < 0) {
     return response.status(404).json({ error: "Todo not found!" });
   }
 
-  users[user].todos[todoIndex].done = true;
+  users[userIndex].todos[todoIndex].done = true;
 });
 
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
   const { user } = request;
   const { id } = request.params;
 
+  const userIndex = users.indexOf(user);
   const todoIndex = users[user].todos.findIndex(todo => todo.id === id);
 
-  users[user].todos.splice(todoIndex, 1);
+  users[userIndex].todos.splice(todoIndex, 1);
 
   return response.status(204);
 });
