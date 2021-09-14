@@ -102,7 +102,7 @@ app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
   }
   
   const todoIndex = user.todos.indexOf(todo);
-  user.slice(todoIndex, 1);
+  user.todos.slice(todoIndex, 1);
 
   return response.status(204);
 });
